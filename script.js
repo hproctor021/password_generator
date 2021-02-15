@@ -1,3 +1,14 @@
+const resultEl = document.getElementById('result')
+// this points to the span element where the generated password will be shown 
+const lengthEl = document.getElementById('length')
+const uppercaseEl = document.getElementById('uppercase')
+const lowercaseEl = document.getElementById('lowercase')
+const numbersEl = document.getElementById('numbers')
+const symbolsEl = document.getElementById('symbols')
+const generateEl = document.getElementById('generate')
+const clipboardEl = document.getElementById('clipboard')
+
+
 const randomFunc = {
     lower: getRandomLower,
     upper: getRandomUpper,
@@ -5,6 +16,42 @@ const randomFunc = {
     symbol: getRandomSymbol
 }
 
+generateEl.addEventListener('click', () => {
+    const length = +lengthEl.value
+    // grab the input by using .value
+    // parse the string into a number by adding a + in front
+    const hasLower = lowercaseEl.checked
+    const hasUpper = uppercaseEl.checked
+    const hasNumber = numbersEl.checked
+    const hasSymbol = symbolsEl.checked
+  
+    resultEl.innerText = generatePassword(hasLower, hasUpper, hasNumber, hasSymbol, length)
+})
+
+function generatePassword(lower, upper, number, symbol, length){
+    let generatedPassword = ''
+    const typesCount = lower + upper + number + symbol
+    let typesArr = [{lower}, {upper}, {number}, {symbol}].filter( item => Object.values(item)[0])
+    //this should filter out any object that is checked --> excluding false(non-checked items)
+
+    if(typesCount === 0){
+        return ''
+    }
+
+    for(let i = 0; i < length; i += typesCount ){
+        typesArr.forEach(type => {
+            const funcName = Object.keys(type)[0]
+            //returns lower, upper, number, symbol
+            generatedPassword += randomFunc[funcName]()
+            //this will loop through, apending onto our empty string - depending on the length( number inputted by user) 
+            //creating a random lowercase, uppercase, number & symbol in that order until it is as long as the length input
+        })
+    }
+
+    const finalPassword = generatedPassword.slice(0, length)
+
+    return finalPassword
+}
 
 function getRandomLower() {
     return String.fromCharCode(Math.floor(Math.random() * 26) + 97)
